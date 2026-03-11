@@ -9,7 +9,7 @@ const examplePrompts = [
 
 const submitPrompt = () => {
   if (!prompt.value.trim()) return
-  navigateTo(`/history?prompt=${encodeURIComponent(prompt.value)}`)
+  navigateTo(`/results?prompt=${encodeURIComponent(prompt.value)}`)
 }
 
 const useExample = (value: string) => {
@@ -18,28 +18,33 @@ const useExample = (value: string) => {
 </script>
 
 <template>
-  <section class="hero-section">
+  <section class="hero-section hero-compact">
     <v-container>
-      <v-row align="center" class="ga-6">
+      <v-row align="center" class="hero-row">
         <v-col cols="12" lg="7">
-          <div class="hero-glow pa-2 pa-md-4">
-            <div class="text-overline text-secondary mb-3">
-              AI-powered game recommendations
+          <div class="hero-glow fade-up">
+            <div class="hero-copy">
+              <div class="pill-label mb-4 fade-up">
+                <v-icon icon="mdi-sparkles" size="16" color="secondary" />
+                AI-powered game recommendations
+              </div>
+
+              <h1 class="text-h3 text-sm-h2 text-md-h1 font-weight-black mb-4 hero-heading fade-up-delay-1">
+                Discover your <span class="text-gradient">next favorite game</span> with a journal that feels personal.
+              </h1>
+
+              <p class="text-body-1 text-md-h6 font-weight-regular muted-copy mb-6 hero-subcopy fade-up-delay-2">
+                Describe your vibe, favorite mechanics, or available time. NextQuest turns that into spoiler-free recommendations and lets you save the ones worth coming back to.
+              </p>
+
+              <div class="hero-metrics fade-up-delay-2">
+                <div class="pill-label"><strong>AI-first</strong> recommendations</div>
+                <div class="pill-label"><strong>Vector search</strong> retrieval</div>
+                <div class="pill-label"><strong>No login</strong> required</div>
+              </div>
             </div>
 
-            <h1 class="text-h3 text-sm-h2 text-md-h1 font-weight-black mb-4">
-              Find your <span class="text-gradient">next favorite game</span>
-            </h1>
-
-            <p
-              class="text-body-1 text-md-h6 font-weight-regular text-medium-emphasis mb-6"
-              style="max-width: 720px;"
-            >
-              Describe your vibe, your favorite mechanics, or how much time you have.
-              NextQuest gives you spoiler-free game picks that actually fit.
-            </p>
-
-            <v-card class="glass-card pa-4 pa-md-6">
+            <v-card class="glass-card hero-search-card shimmer-border fade-up-delay-2" rounded="2xl">
               <v-textarea
                 v-model="prompt"
                 label="Describe the kind of game you want"
@@ -49,11 +54,12 @@ const useExample = (value: string) => {
                 placeholder="Example: I want a cozy pixel-art game with strong characters and no sweaty combat."
               />
 
-              <div class="d-flex flex-column flex-sm-row ga-3 mt-4">
+              <div class="d-flex flex-column flex-sm-row ga-3 mt-5">
                 <v-btn
                   color="primary"
                   size="large"
                   prepend-icon="mdi-magnify"
+                  class="hero-action"
                   @click="submitPrompt"
                 >
                   Find my next game
@@ -62,20 +68,23 @@ const useExample = (value: string) => {
                 <v-btn
                   variant="tonal"
                   size="large"
-                  prepend-icon="mdi-shuffle-variant"
+                  prepend-icon="mdi-bookmark-outline"
+                  class="hero-action"
+                  to="/my-list"
                 >
-                  Surprise me
+                  Open my list
                 </v-btn>
               </div>
 
               <div class="mt-6">
-                <div class="text-caption text-medium-emphasis mb-2">Try an example</div>
+                <div class="text-caption text-medium-emphasis mb-3">Try an example</div>
                 <div class="d-flex flex-wrap ga-2">
                   <v-chip
                     v-for="item in examplePrompts"
                     :key="item"
                     size="small"
                     variant="outlined"
+                    class="chip-soft interactive-lift"
                     @click="useExample(item)"
                   >
                     {{ item }}
@@ -83,43 +92,117 @@ const useExample = (value: string) => {
                 </div>
               </div>
             </v-card>
+
+            <MoodChipRow class="fade-up-delay-3" />
           </div>
         </v-col>
 
         <v-col cols="12" lg="5">
-          <v-card class="glass-card card-hover pa-4 pa-md-5">
-            <div class="d-flex align-center ga-3 mb-4">
-              <v-avatar color="secondary" size="44">
-                <v-icon icon="mdi-sparkles" />
-              </v-avatar>
-              <div>
-                <div class="text-subtitle-1 font-weight-bold">Sample match</div>
-                <div class="text-caption text-medium-emphasis">Based on vibe + vector search</div>
+          <v-card class="glass-card card-hover hero-preview shimmer-border spotlight-card float-card fade-up-delay-3" rounded="2xl">
+            <div class="d-flex align-center justify-space-between ga-3 mb-5">
+              <div class="d-flex align-center ga-3">
+                <v-avatar color="secondary" size="46">
+                  <v-icon icon="mdi-sparkles" />
+                </v-avatar>
+                <div>
+                  <div class="text-subtitle-1 font-weight-bold">Sample match</div>
+                  <div class="text-caption text-medium-emphasis">Powered by vibe + vector search</div>
+                </div>
               </div>
+
+              <v-chip size="small" color="primary" variant="tonal">15 hrs</v-chip>
             </div>
 
             <v-img
-              src="/images/games/sample-game.jpg"
-              height="220"
+              src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80"
+              height="240"
               cover
-              class="rounded-lg mb-4"
+              class="rounded-xl mb-5"
             />
 
             <div class="text-h5 font-weight-bold mb-2">Spiritfarer</div>
 
             <div class="d-flex flex-wrap ga-2 mb-4">
-              <v-chip size="small" color="primary">Cozy</v-chip>
-              <v-chip size="small" color="secondary">Story Rich</v-chip>
-              <v-chip size="small" color="accent">15 hours</v-chip>
+              <v-chip size="small" color="primary" variant="tonal">Cozy</v-chip>
+              <v-chip size="small" color="secondary" variant="tonal">Story Rich</v-chip>
+              <v-chip size="small" variant="outlined" class="chip-soft">Management</v-chip>
             </div>
 
-            <p class="text-body-2 text-medium-emphasis mb-0">
-              A warm, emotional management adventure with gorgeous art, approachable systems,
-              and a relaxed pace that makes it ideal for players wanting comfort plus heart.
+            <p class="text-body-2 muted-copy mb-5">
+              A warm, emotional management adventure with gorgeous art, approachable systems, and a relaxed pace that makes it ideal for players wanting comfort plus heart.
             </p>
+
+            <div class="preview-meta">
+              <div>
+                <div class="text-caption text-medium-emphasis">Why it works</div>
+                <div class="text-body-2">Calm pacing, heartfelt characters, and no punishing difficulty curve.</div>
+              </div>
+              <v-btn color="primary" variant="flat">Preview results</v-btn>
+            </div>
           </v-card>
         </v-col>
       </v-row>
     </v-container>
   </section>
 </template>
+
+<style scoped>
+.hero-row {
+  row-gap: 24px;
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-heading {
+  max-width: 760px;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+}
+
+.hero-subcopy {
+  max-width: 700px;
+}
+
+.hero-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 26px;
+}
+
+.hero-search-card {
+  position: relative;
+  z-index: 1;
+  padding: 22px;
+}
+
+.hero-preview {
+  padding: 22px;
+}
+
+.preview-meta {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.hero-action {
+  min-width: 180px;
+}
+
+@media (max-width: 760px) {
+  .hero-search-card,
+  .hero-preview {
+    padding: 18px;
+  }
+
+  .preview-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+</style>

@@ -16,9 +16,9 @@ const moods = [
     <v-chip
       v-for="mood in moods"
       :key="mood"
-      color="white"
       variant="outlined"
       size="large"
+      class="chip-soft"
     >
       {{ mood }}
     </v-chip>
