@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { useDisplay } from 'vuetify'
+
 const drawer = ref(false)
 const route = useRoute()
+const { mdAndUp, smAndDown } = useDisplay()
 
 const links = [
   { label: 'Home', to: '/' },
@@ -32,7 +35,7 @@ watch(() => route.path, () => {
             </div>
           </NuxtLink>
 
-          <nav class="nav-links d-none d-md-flex">
+          <nav v-if="mdAndUp" class="nav-links">
             <NuxtLink v-for="link in links" :key="link.to" :to="link.to">
               <v-btn
                 rounded="pill"
@@ -46,9 +49,9 @@ watch(() => route.path, () => {
           </nav>
 
           <v-btn
-            class="d-flex d-md-none"
+            v-if="smAndDown"
+            class="mobile-menu-btn"
             icon
-            rounded="xl"
             variant="tonal"
             color="primary"
             aria-label="Open navigation menu"
@@ -150,6 +153,10 @@ watch(() => route.path, () => {
 
 .nav-btn {
   min-width: 84px;
+}
+
+.mobile-menu-btn {
+  margin-left: auto;
 }
 
 .mobile-drawer :deep(.v-navigation-drawer__content) {
