@@ -69,7 +69,7 @@ const howItWorks = [
             />
           </v-col>
 
-          <v-col cols="12" lg="5">
+          <v-col cols="12">
             <div class="highlights-grid fade-up-delay-1">
               <v-card
                 v-for="item in highlights"
@@ -141,13 +141,14 @@ const howItWorks = [
 .highlights-grid {
   display: grid;
   gap: 12px;
+  grid-template-columns: 1fr;
 }
 
 .highlight-card {
   min-height: 122px;
 }
 
-@media (min-width: 700px) and (max-width: 1279px) {
+@media (min-width: 960px) {
   .highlights-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }

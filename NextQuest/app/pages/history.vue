@@ -3,12 +3,16 @@ const historyItems = ref<any[]>([])
 const loading = ref(true)
 const errorMessage = ref('')
 
+const { profileId, initProfile } = useProfile()
 const { getHistory } = useRecommendations()
 
 const loadHistory = async () => {
   try {
     loading.value = true
     errorMessage.value = ''
+    if (!profileId.value) {
+      await initProfile()
+    }
     historyItems.value = await getHistory()
   } catch (error) {
     console.error(error)

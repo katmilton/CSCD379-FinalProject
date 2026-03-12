@@ -1,8 +1,12 @@
 <script setup lang="ts">
 const { initProfile } = useProfile()
 
-onMounted(() => {
-  initProfile()
+onMounted(async () => {
+  try {
+    await initProfile()
+  } catch (error) {
+    console.error('Profile init failed', error)
+  }
 })
 </script>
 

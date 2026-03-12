@@ -31,7 +31,7 @@ const submitPrompt = async () => {
     recommendationPrompt.value = response.prompt
     recommendationResults.value = response.recommendations
 
-    await navigateTo('/results')
+    await navigateTo(`/results?prompt=${encodeURIComponent(prompt.value)}`)
   } catch (error) {
     console.error(error)
     errorMessage.value = 'Something went wrong while generating recommendations.'
@@ -74,37 +74,39 @@ const useExample = async (value: string) => {
             </div>
 
             <v-card class="glass-card hero-search-card shimmer-border fade-up-delay-2" rounded="2xl">
-              <v-textarea
-                v-model="prompt"
-                label="Describe the kind of game you want"
-                rows="3"
-                auto-grow
-                hide-details
-                placeholder="Example: I want a cozy pixel-art game with strong characters and no sweaty combat."
-              />
+              <form @submit.prevent="submitPrompt">
+                <v-textarea
+                  v-model="prompt"
+                  label="Describe the kind of game you want"
+                  rows="3"
+                  auto-grow
+                  hide-details
+                  placeholder="Example: I want a cozy pixel-art game with strong characters and no sweaty combat."
+                />
 
-              <div class="d-flex flex-column flex-sm-row ga-3 mt-5">
-                <v-btn
-                  color="primary"
-                  size="large"
-                  prepend-icon="mdi-magnify"
-                  class="hero-action"
-                  :loading="loading"
-                  @click="submitPrompt"
-                >
-                  Find my next game
-                </v-btn>
+                <div class="d-flex flex-column flex-sm-row ga-3 mt-5">
+                  <v-btn
+                    color="primary"
+                    size="large"
+                    prepend-icon="mdi-magnify"
+                    class="hero-action"
+                    :loading="loading"
+                    type="submit"
+                  >
+                    Find my next game
+                  </v-btn>
 
-                <v-btn
-                  variant="tonal"
-                  size="large"
-                  prepend-icon="mdi-bookmark-outline"
-                  class="hero-action"
-                  to="/my-list"
-                >
-                  Open my list
-                </v-btn>
-              </div>
+                  <v-btn
+                    variant="tonal"
+                    size="large"
+                    prepend-icon="mdi-bookmark-outline"
+                    class="hero-action"
+                    to="/my-list"
+                  >
+                    Open my list
+                  </v-btn>
+                </div>
+              </form>
 
               <div class="mt-6">
                 <div class="text-caption text-medium-emphasis mb-3">Try an example</div>
@@ -123,15 +125,13 @@ const useExample = async (value: string) => {
               </div>
 
               <div v-if="errorMessage" class="text-body-2 mt-4" style="color: #ff8a80;">
-  {{ errorMessage }}
-</div>
+                {{ errorMessage }}
+              </div>
             </v-card>
 
             <MoodChipRow class="fade-up-delay-3" />
           </div>
         </v-col>
-
-        
 
         <v-col cols="12" lg="5">
           <v-card class="glass-card card-hover hero-preview shimmer-border spotlight-card float-card fade-up-delay-3" rounded="2xl">

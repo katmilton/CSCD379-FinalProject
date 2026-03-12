@@ -3,12 +3,16 @@ const savedGames = ref<any[]>([])
 const loading = ref(true)
 const errorMessage = ref('')
 
+const { profileId, initProfile } = useProfile()
 const { getSavedGames } = useSavedGames()
 
 const loadSavedGames = async () => {
   try {
     loading.value = true
     errorMessage.value = ''
+    if (!profileId.value) {
+      await initProfile()
+    }
     savedGames.value = await getSavedGames()
   } catch (error) {
     console.error(error)
