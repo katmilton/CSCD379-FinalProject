@@ -1,5 +1,7 @@
 <script setup lang="ts">
 const prompt = ref('')
+const loading = ref(false)
+const errorMessage = ref('')
 
 const examplePrompts = [
   'I want a cozy game with a great story under 20 hours',
@@ -7,13 +9,40 @@ const examplePrompts = [
   'Give me a beautiful single-player game with exploration'
 ]
 
-const submitPrompt = () => {
+const { profileId, initProfile } = useProfile()
+const { getRecommendations } = useRecommendations()
+
+const recommendationPrompt = useState<string>('recommendationPrompt', () => '')
+const recommendationResults = useState<any[]>('recommendationResults', () => [])
+
+const submitPrompt = async () => {
   if (!prompt.value.trim()) return
-  navigateTo(`/results?prompt=${encodeURIComponent(prompt.value)}`)
+
+  try {
+    loading.value = true
+    errorMessage.value = ''
+
+    if (!profileId.value) {
+      await initProfile()
+    }
+
+    const response = await getRecommendations(prompt.value)
+
+    recommendationPrompt.value = response.prompt
+    recommendationResults.value = response.recommendations
+
+    await navigateTo('/results')
+  } catch (error) {
+    console.error(error)
+    errorMessage.value = 'Something went wrong while generating recommendations.'
+  } finally {
+    loading.value = false
+  }
 }
 
-const useExample = (value: string) => {
+const useExample = async (value: string) => {
   prompt.value = value
+  await submitPrompt()
 }
 </script>
 
@@ -60,6 +89,7 @@ const useExample = (value: string) => {
                   size="large"
                   prepend-icon="mdi-magnify"
                   class="hero-action"
+                  :loading="loading"
                   @click="submitPrompt"
                 >
                   Find my next game
@@ -91,11 +121,17 @@ const useExample = (value: string) => {
                   </v-chip>
                 </div>
               </div>
+
+              <div v-if="errorMessage" class="text-body-2 mt-4" style="color: #ff8a80;">
+  {{ errorMessage }}
+</div>
             </v-card>
 
             <MoodChipRow class="fade-up-delay-3" />
           </div>
         </v-col>
+
+        
 
         <v-col cols="12" lg="5">
           <v-card class="glass-card card-hover hero-preview shimmer-border spotlight-card float-card fade-up-delay-3" rounded="2xl">
@@ -137,7 +173,13 @@ const useExample = (value: string) => {
                 <div class="text-caption text-medium-emphasis">Why it works</div>
                 <div class="text-body-2">Calm pacing, heartfelt characters, and no punishing difficulty curve.</div>
               </div>
-              <v-btn color="primary" variant="flat">Preview results</v-btn>
+              <v-btn
+                color="primary"
+                variant="flat"
+                @click="useExample('I want a cozy game with a great story under 20 hours')"
+              >
+                Preview results
+              </v-btn>
             </div>
           </v-card>
         </v-col>

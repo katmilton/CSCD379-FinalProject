@@ -23,6 +23,7 @@ async function main() {
     name: indexName,
     fields: [
       { name: 'id', type: 'Edm.String', key: true, filterable: true },
+      { name: 'gameId', type: 'Edm.Int32', filterable: true, sortable: true },
       { name: 'title', type: 'Edm.String', searchable: true },
       { name: 'description', type: 'Edm.String', searchable: true },
       { name: 'genres', type: 'Collection(Edm.String)', searchable: true, filterable: true, facetable: true },

@@ -1,16 +1,35 @@
 <script setup lang="ts">
-interface Recommendation {
-  title: string
-  imageUrl: string
-  description: string
-  tags: string[]
-  estimatedHours: number
-  platforms: string[]
-}
-
-defineProps<{
-  game: Recommendation
+const props = defineProps<{
+  game: {
+    gameId?: number | string
+    title: string
+    imageUrl: string
+    description: string
+    tags: string[]
+    estimatedHours: number
+    platforms: string[]
+    whyItMatches?: string
+  }
 }>()
+
+const saving = ref(false)
+const saved = ref(false)
+
+const { saveGame } = useSavedGames()
+
+const onSave = async () => {
+  if (typeof props.game.gameId !== 'number') return
+
+  try {
+    saving.value = true
+    await saveGame(props.game.gameId)
+    saved.value = true
+  } catch (error) {
+    console.error(error)
+  } finally {
+    saving.value = false
+  }
+}
 </script>
 
 <template>
@@ -34,24 +53,50 @@ defineProps<{
           </div>
         </div>
 
-        <v-btn icon variant="text" aria-label="Save game">
-          <v-icon icon="mdi-bookmark-outline" />
+        <v-btn icon variant="text" class="interactive-lift">
+          <v-icon :icon="saved ? 'mdi-bookmark' : 'mdi-bookmark-outline'" />
         </v-btn>
       </div>
 
-      <div class="meta-row mb-4">
-        <span><v-icon icon="mdi-clock-outline" size="18" class="mr-1" /> {{ game.estimatedHours }} hrs</span>
-        <span><v-icon icon="mdi-controller-classic-outline" size="18" class="mr-1" /> {{ game.platforms.join(' · ') }}</span>
+      <div class="meta-row text-body-2 text-medium-emphasis mb-4">
+        <span class="meta-item">
+          <v-icon icon="mdi-clock-outline" size="18" class="mr-1" />
+          {{ game.estimatedHours }} hrs
+        </span>
+        <span class="meta-item">
+          <v-icon icon="mdi-controller" size="18" class="mr-1" />
+          {{ game.platforms.join(', ') }}
+        </span>
       </div>
 
-      <p class="text-body-2 muted-copy mb-5">
+      <p class="text-body-2 text-medium-emphasis mb-3 recommendation-copy">
         {{ game.description }}
       </p>
 
-      <div class="action-row">
+      <v-card
+        v-if="game.whyItMatches"
+        class="pa-4 mb-4"
+        color="rgba(255,255,255,0.03)"
+        rounded="xl"
+      >
+        <div class="text-caption text-medium-emphasis mb-2">Why it matches</div>
+        <div class="text-body-2">
+          {{ game.whyItMatches }}
+        </div>
+      </v-card>
+
+      <v-card-actions class="px-0 pb-0 pt-0 d-flex flex-wrap ga-2">
         <v-btn color="primary">Why it matches</v-btn>
-        <v-btn variant="text">Save</v-btn>
-      </div>
+
+        <v-btn
+          v-if="typeof game.gameId === 'number'"
+          variant="text"
+          :loading="saving"
+          @click="onSave"
+        >
+          {{ saved ? 'Saved' : 'Save' }}
+        </v-btn>
+      </v-card-actions>
     </div>
   </v-card>
 </template>
@@ -69,14 +114,14 @@ defineProps<{
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
-  color: rgba(255, 255, 255, 0.62);
-  font-size: 0.92rem;
 }
 
-.action-row {
-  display: flex;
+.meta-item {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+}
+
+.recommendation-copy {
+  line-height: 1.65;
 }
 </style>

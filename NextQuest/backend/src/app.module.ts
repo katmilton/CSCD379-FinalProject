@@ -5,6 +5,7 @@ import { ProfilesModule } from './profiles/profiles.module'
 import { SavedGamesModule } from './saved-games/saved-games.module'
 import { RecommendationsModule } from './recommendations/recommendations.module'
 import { AzureSearchModule } from './azure-search/azure-search.module'
+import { OpenAiModule } from './openai/openai.module'
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { AzureSearchModule } from './azure-search/azure-search.module'
     ProfilesModule,
     SavedGamesModule,
     RecommendationsModule,
-    AzureSearchModule
+    AzureSearchModule,
+    OpenAiModule
   ]
 })
 export class AppModule {}

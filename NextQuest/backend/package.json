@@ -11,7 +11,8 @@
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
-    "search:create-index": "ts-node scripts/create-search-index.ts"
+    "search:create-index": "ts-node scripts/create-search-index.ts",
+    "search:upload": "ts-node scripts/upload-search-docs.ts"
   },
   "dependencies": {
     "@azure/search-documents": "^12.2.0",
@@ -22,6 +23,8 @@
     "@prisma/client": "^6.19.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
+    "dotenv": "^17.3.1",
+    "openai": "^6.27.0",
     "prisma": "^6.19.2",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"

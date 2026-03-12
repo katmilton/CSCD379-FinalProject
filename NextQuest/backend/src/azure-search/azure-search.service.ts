@@ -42,6 +42,7 @@ export class AzureSearchService {
       },
       select: [
         'id',
+        'gameId',
         'title',
         'description',
         'genres',
