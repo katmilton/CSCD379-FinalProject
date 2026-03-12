@@ -1,7 +1,7 @@
 export const useProfile = () => {
   const profileId = useState<string | null>('profileId', () => null)
 
-  const initProfile = () => {
+  const initProfile = async () => {
     if (!import.meta.client) return
 
     let id = localStorage.getItem('nextquest-profile-id')
@@ -11,7 +11,17 @@ export const useProfile = () => {
       localStorage.setItem('nextquest-profile-id', id)
     }
 
-    profileId.value = id
+    const config = useRuntimeConfig()
+
+    const response = await $fetch<{ profileId: string }>(
+      `${config.public.apiBaseUrl}/profiles/init`,
+      {
+        method: 'POST',
+        body: { profileId: id }
+      }
+    )
+
+    profileId.value = response.profileId
   }
 
   return {
