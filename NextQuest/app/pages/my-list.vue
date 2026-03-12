@@ -2,7 +2,6 @@
 const savedGames = ref<any[]>([])
 const loading = ref(true)
 const errorMessage = ref('')
-
 const { profileId, initProfile } = useProfile()
 const { getSavedGames } = useSavedGames()
 
@@ -10,9 +9,7 @@ const loadSavedGames = async () => {
   try {
     loading.value = true
     errorMessage.value = ''
-    if (!profileId.value) {
-      await initProfile()
-    }
+    if (!profileId.value) await initProfile()
     savedGames.value = await getSavedGames()
   } catch (error) {
     console.error(error)
@@ -40,39 +37,20 @@ const mappedGames = computed(() =>
 
 <template>
   <v-container class="page-section section-stack fade-in">
-    <SectionTitle
-      eyebrow="My backlog"
-      title="My List"
-      subtitle="Track games you want to play, what you’re currently into, and what you’ve already finished."
-    />
+    <SectionTitle eyebrow="My backlog" title="My List" subtitle="Track games you want to play and revisit saved recommendations." />
 
-    <div v-if="loading" class="muted-copy">Loading your saved games...</div>
-
-    <div v-else-if="errorMessage" class="text-body-2" style="color: #ff8a80;">
-      {{ errorMessage }}
-    </div>
+    <div v-if="loading" class="text-medium-emphasis">Loading your saved games...</div>
+    <div v-else-if="errorMessage" class="text-body-2" style="color:#ff8a80">{{ errorMessage }}</div>
 
     <v-row v-else-if="mappedGames.length" style="row-gap: 16px;">
-      <v-col
-        v-for="game in mappedGames"
-        :key="game.id"
-        cols="12"
-        md="6"
-        xl="4"
-      >
+      <v-col v-for="game in mappedGames" :key="game.id" cols="12" md="6" xl="4">
         <SavedGameCard :game="game" />
       </v-col>
     </v-row>
 
-    <v-card
-      v-else
-      class="glass-card pa-8 text-center"
-      rounded="2xl"
-    >
+    <v-card v-else class="glass-card pa-8 text-center" rounded="2xl">
       <div class="text-h6 font-weight-bold mb-2">No saved games yet</div>
-      <div class="muted-copy mb-4">
-        Save a recommendation and it will show up here.
-      </div>
+      <div class="mb-4" style="color: rgba(255,255,255,.66)">Save a recommendation and it will show up here.</div>
       <v-btn color="primary" to="/">Find a game</v-btn>
     </v-card>
   </v-container>

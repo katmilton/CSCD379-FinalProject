@@ -12,53 +12,25 @@ defineProps<{
 </script>
 
 <template>
-  <div class="history-list">
-    <v-card
+  <v-timeline density="comfortable" side="end">
+    <v-timeline-item
       v-for="item in items"
       :key="item.id"
-      class="glass-card history-card fade-up"
-      rounded="2xl"
+      dot-color="primary"
+      fill-dot
+      size="small"
     >
-      <div class="history-topline">
-        <v-chip size="small" color="primary" variant="tonal">
+      <v-card class="glass-card pa-5">
+        <div class="text-caption text-medium-emphasis mb-2">
           {{ item.createdAt }}
-        </v-chip>
-        <div class="text-caption text-medium-emphasis">Top pick: {{ item.topPick }}</div>
-      </div>
-
-      <div class="text-subtitle-1 font-weight-bold mb-2">
-        {{ item.prompt }}
-      </div>
-
-      <div class="text-body-2 muted-copy">
-        Saved to your anonymous profile so you can revisit recommendation sessions later.
-      </div>
-    </v-card>
-  </div>
+        </div>
+        <div class="text-subtitle-1 font-weight-bold mb-2">
+          {{ item.prompt }}
+        </div>
+        <div class="text-body-2 text-medium-emphasis">
+          Top pick: {{ item.topPick }}
+        </div>
+      </v-card>
+    </v-timeline-item>
+  </v-timeline>
 </template>
-
-<style scoped>
-.history-list {
-  display: grid;
-  gap: 16px;
-}
-
-.history-card {
-  padding: 20px;
-}
-
-.history-topline {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-@media (max-width: 700px) {
-  .history-topline {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-</style>

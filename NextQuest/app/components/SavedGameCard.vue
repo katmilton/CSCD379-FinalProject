@@ -16,17 +16,17 @@ defineProps<{
 </script>
 
 <template>
-  <v-card class="glass-card card-hover saved-card h-100 fade-up" rounded="2xl">
+  <v-card class="glass-card card-hover h-100">
     <v-img :src="game.imageUrl" height="220" cover />
 
-    <div class="saved-body">
-      <div class="d-flex align-start justify-space-between ga-3 mb-4">
+    <v-card-text class="pa-6">
+      <div class="d-flex align-start justify-space-between ga-3 mb-3">
         <div>
           <div class="text-h6 font-weight-bold mb-2">{{ game.title }}</div>
           <StatusChip :status="game.status" />
         </div>
 
-        <v-btn icon variant="text" aria-label="More actions">
+        <v-btn icon variant="text">
           <v-icon icon="mdi-dots-horizontal" />
         </v-btn>
       </div>
@@ -36,43 +36,28 @@ defineProps<{
           v-for="tag in game.tags"
           :key="tag"
           size="small"
+          color="primary"
           variant="outlined"
-          class="chip-soft"
         >
           {{ tag }}
         </v-chip>
       </div>
 
-      <div class="text-body-2 muted-copy mb-3">
-        <v-icon icon="mdi-clock-outline" size="18" class="mr-1" />
+      <div class="text-body-2 text-medium-emphasis mb-3">
+        <v-icon icon="mdi-clock-outline" class="mr-1" />
         {{ game.estimatedHours }} hours
       </div>
 
-      <p class="text-body-2 muted-copy mb-5">
+      <p class="text-body-2 text-medium-emphasis mb-4">
         {{ game.description }}
       </p>
 
-      <div class="note-surface">
+      <v-card class="pa-4" color="rgba(255,255,255,0.03)" rounded="xl">
         <div class="text-caption text-medium-emphasis mb-2">Your note</div>
-        <div class="text-body-2">{{ game.note || 'No note yet.' }}</div>
-      </div>
-    </div>
+        <div class="text-body-2">
+          {{ game.note || 'No note yet.' }}
+        </div>
+      </v-card>
+    </v-card-text>
   </v-card>
 </template>
-
-<style scoped>
-.saved-card {
-  overflow: hidden;
-}
-
-.saved-body {
-  padding: 22px;
-}
-
-.note-surface {
-  padding: 16px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-</style>

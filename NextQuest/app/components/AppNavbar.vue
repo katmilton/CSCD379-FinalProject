@@ -3,46 +3,42 @@ const drawer = ref(false)
 const route = useRoute()
 
 const links = [
-  { label: 'Home', to: '/', icon: 'mdi-home-variant-outline' },
-  { label: 'Results', to: '/results', icon: 'mdi-sparkles-outline' },
-  { label: 'My List', to: '/my-list', icon: 'mdi-bookmark-outline' },
-  { label: 'History', to: '/history', icon: 'mdi-history' }
+  { label: 'Home', to: '/' },
+  { label: 'Results', to: '/results' },
+  { label: 'My List', to: '/my-list' },
+  { label: 'History', to: '/history' }
 ]
 
-const isActive = (to: string) => route.path === to
-
-watch(() => route.fullPath, () => {
+watch(() => route.path, () => {
   drawer.value = false
 })
 </script>
 
 <template>
   <div>
-    <v-app-bar flat color="transparent" height="88" class="fade-in">
+    <v-app-bar flat color="transparent" height="88" class="app-navbar">
       <v-container>
-        <div class="nav-shell surface-panel shimmer-border">
+        <div class="nav-shell glass-card">
           <NuxtLink to="/" class="brand-link interactive-lift">
-            <v-avatar color="primary" size="42" class="brand-avatar">
-              <v-icon icon="mdi-gamepad-variant" />
-            </v-avatar>
+            <div class="brand-left">
+              <v-avatar color="primary" size="40" class="brand-avatar">
+                <v-icon icon="mdi-gamepad-variant" />
+              </v-avatar>
 
-            <div class="brand-copy">
-              <div class="brand-title">NextQuest</div>
-              <div class="brand-subtitle">AI game discovery journal</div>
+              <div class="brand-copy">
+                <div class="brand-title">NextQuest</div>
+                <div class="brand-subtitle">AI game discovery journal</div>
+              </div>
             </div>
           </NuxtLink>
 
           <nav class="nav-links d-none d-md-flex">
-            <NuxtLink
-              v-for="link in links"
-              :key="link.to"
-              :to="link.to"
-            >
+            <NuxtLink v-for="link in links" :key="link.to" :to="link.to">
               <v-btn
-                :variant="isActive(link.to) ? 'flat' : 'text'"
-                :color="isActive(link.to) ? 'primary' : undefined"
-                rounded="xl"
-                class="nav-button"
+                rounded="pill"
+                class="nav-btn"
+                :variant="route.path === link.to ? 'flat' : 'text'"
+                :color="route.path === link.to ? 'primary' : undefined"
               >
                 {{ link.label }}
               </v-btn>
@@ -50,8 +46,9 @@ watch(() => route.fullPath, () => {
           </nav>
 
           <v-btn
-            class="d-md-none"
+            class="d-flex d-md-none"
             icon
+            rounded="xl"
             variant="tonal"
             color="primary"
             aria-label="Open navigation menu"
@@ -71,21 +68,19 @@ watch(() => route.fullPath, () => {
       class="mobile-drawer"
     >
       <div class="drawer-inner">
-        <div class="drawer-header">
-          <div class="text-overline text-secondary">Navigate</div>
-          <div class="text-h6 font-weight-bold">NextQuest</div>
-        </div>
+        <div class="text-overline text-secondary mb-2">Navigate</div>
+        <div class="text-h6 font-weight-bold mb-4">NextQuest</div>
 
         <div class="drawer-links">
           <v-btn
             v-for="link in links"
             :key="link.to"
             block
+            rounded="xl"
             size="large"
-            class="justify-start drawer-link"
-            :prepend-icon="link.icon"
-            :variant="isActive(link.to) ? 'flat' : 'text'"
-            :color="isActive(link.to) ? 'primary' : undefined"
+            class="justify-start"
+            :variant="route.path === link.to ? 'flat' : 'text'"
+            :color="route.path === link.to ? 'primary' : undefined"
             :to="link.to"
           >
             {{ link.label }}
@@ -97,12 +92,16 @@ watch(() => route.fullPath, () => {
 </template>
 
 <style scoped>
+.app-navbar {
+  backdrop-filter: blur(12px);
+}
+
 .nav-shell {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  min-height: 64px;
+  min-height: 68px;
   padding: 10px 14px;
   border-radius: 999px;
 }
@@ -110,55 +109,57 @@ watch(() => route.fullPath, () => {
 .brand-link {
   display: flex;
   align-items: center;
-  gap: 12px;
   min-width: 0;
 }
 
+.brand-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .brand-avatar {
-  box-shadow: 0 10px 28px rgba(139, 92, 246, 0.34);
+  box-shadow: 0 0 0 10px rgba(139, 92, 246, 0.08);
 }
 
 .brand-copy {
   display: flex;
   flex-direction: column;
-  line-height: 1.08;
+  line-height: 1.1;
 }
 
 .brand-title {
-  font-size: 1.12rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: white;
+  white-space: nowrap;
 }
 
 .brand-subtitle {
-  color: rgba(255, 255, 255, 0.62);
   font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.66);
+  white-space: nowrap;
 }
 
 .nav-links {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 4px;
-  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
 }
 
-.nav-button {
-  min-width: 0;
+.nav-btn {
+  min-width: 84px;
 }
 
 .mobile-drawer :deep(.v-navigation-drawer__content) {
   background:
-    radial-gradient(circle at top, rgba(139, 92, 246, 0.18), transparent 30%),
-    linear-gradient(180deg, rgba(11, 13, 18, 0.98) 0%, rgba(15, 20, 32, 0.98) 100%);
+    radial-gradient(circle at top, rgba(139, 92, 246, 0.18), transparent 32%),
+    linear-gradient(180deg, rgba(14, 18, 30, 0.98), rgba(10, 13, 24, 0.98));
 }
 
 .drawer-inner {
-  padding: 20px 16px;
-}
-
-.drawer-header {
-  padding: 8px 10px 18px;
+  padding: 24px 18px;
 }
 
 .drawer-links {
@@ -166,15 +167,7 @@ watch(() => route.fullPath, () => {
   gap: 8px;
 }
 
-.drawer-link {
-  min-height: 52px;
-}
-
-@media (max-width: 760px) {
-  .nav-shell {
-    border-radius: 28px;
-  }
-
+@media (max-width: 959px) {
   .brand-subtitle {
     display: none;
   }
