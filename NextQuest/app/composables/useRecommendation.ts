@@ -1,5 +1,5 @@
 export type RecommendationItem = {
-  gameId: number | string
+  gameId: number
   title: string
   description: string
   whyItMatches: string
