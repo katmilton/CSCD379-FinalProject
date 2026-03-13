@@ -2,6 +2,7 @@
 const prompt = ref('')
 const selectedMoods = ref<string[]>([])
 const loading = ref(false)
+const previewLoading = ref(true)
 const errorMessage = ref('')
 
 const examplePrompts = [
@@ -9,6 +10,23 @@ const examplePrompts = [
   'Recommend something like Hades but less stressful',
   'Give me a beautiful single-player game with exploration'
 ]
+
+const previewPrompt = 'I want a cozy game with a great story under 20 hours'
+
+const fallbackPreview = {
+  gameId: undefined,
+  title: 'Spiritfarer',
+  imageUrl: 'https://res.cloudinary.com/da1bsh2xl/image/upload/v1773370353/spiritfarer_wq0eom.jpg',
+  description:
+    'A warm, emotional management adventure with gorgeous art, approachable systems, and a relaxed pace that makes it ideal for players wanting comfort plus heart.',
+  tags: ['Cozy', 'Story Rich', 'Management'],
+  estimatedHours: 15,
+  platforms: ['PC', 'Switch', 'Xbox'],
+  whyItMatches:
+    'Calm pacing, heartfelt characters, and a strong emotional core make it a great fit for players looking for comfort and story.'
+}
+
+const homepagePreview = ref({ ...fallbackPreview })
 
 const { profileId, initProfile } = useProfile()
 const { getRecommendations } = useRecommendations()
@@ -19,7 +37,9 @@ const recommendationResults = useState<any[]>('recommendationResults', () => [])
 const buildPrompt = () => {
   const parts: string[] = []
   if (prompt.value.trim()) parts.push(prompt.value.trim())
-  if (selectedMoods.value.length) parts.push(`Focus on these vibes or tags: ${selectedMoods.value.join(', ')}.`)
+  if (selectedMoods.value.length) {
+    parts.push(`Focus on these vibes or tags: ${selectedMoods.value.join(', ')}.`)
+  }
   return parts.join('\n')
 }
 
@@ -49,6 +69,26 @@ const submitPrompt = async () => {
   }
 }
 
+const loadHomepagePreview = async () => {
+  try {
+    previewLoading.value = true
+
+    if (!profileId.value) {
+      await initProfile()
+    }
+
+    const response = await getRecommendations(previewPrompt)
+    if (response.recommendations?.length) {
+      homepagePreview.value = response.recommendations[0]
+    }
+  } catch (error) {
+    console.error('Homepage preview failed:', error)
+    homepagePreview.value = { ...fallbackPreview }
+  } finally {
+    previewLoading.value = false
+  }
+}
+
 const useExample = async (value: string) => {
   prompt.value = value
   await submitPrompt()
@@ -57,6 +97,10 @@ const useExample = async (value: string) => {
 const clearFilters = () => {
   selectedMoods.value = []
 }
+
+onMounted(async () => {
+  await loadHomepagePreview()
+})
 </script>
 
 <template>
@@ -75,7 +119,10 @@ const clearFilters = () => {
                 Discover your <span class="text-gradient">next favorite game</span> with a journal that feels personal.
               </h1>
 
-              <p class="text-body-1 text-md-h6 font-weight-regular mb-6 hero-subcopy fade-up-delay-2" style="color: rgba(255,255,255,.72)">
+              <p
+                class="text-body-1 text-md-h6 font-weight-regular mb-6 hero-subcopy fade-up-delay-2"
+                style="color: rgba(255,255,255,.72)"
+              >
                 Describe your vibe, favorite mechanics, or available time. NextQuest turns that into spoiler-free recommendations and lets you save the ones worth coming back to.
               </p>
 
@@ -155,7 +202,13 @@ const clearFilters = () => {
               <div v-if="selectedMoods.length" class="selected-tags mt-4">
                 <div class="text-caption text-medium-emphasis mb-2">Search will include</div>
                 <div class="d-flex flex-wrap ga-2">
-                  <v-chip v-for="mood in selectedMoods" :key="mood" color="primary" variant="tonal" size="small">
+                  <v-chip
+                    v-for="mood in selectedMoods"
+                    :key="mood"
+                    color="primary"
+                    variant="tonal"
+                    size="small"
+                  >
                     {{ mood }}
                   </v-chip>
                 </div>
@@ -169,53 +222,74 @@ const clearFilters = () => {
         </v-col>
 
         <v-col cols="12" lg="5">
-          <v-card class="glass-card card-hover hero-preview shimmer-border spotlight-card float-card fade-up-delay-3" rounded="2xl">
+          <v-card
+            class="glass-card card-hover hero-preview shimmer-border spotlight-card float-card fade-up-delay-3"
+            rounded="2xl"
+          >
             <div class="d-flex align-center justify-space-between ga-3 mb-5">
               <div class="d-flex align-center ga-3">
                 <v-avatar color="secondary" size="46">
                   <v-icon icon="mdi-sparkles" />
                 </v-avatar>
                 <div>
-                  <div class="text-subtitle-1 font-weight-bold">Sample match</div>
-                  <div class="text-caption text-medium-emphasis">Powered by vibe + vector search</div>
+                  <div class="text-subtitle-1 font-weight-bold">Live match preview</div>
+                  <div class="text-caption text-medium-emphasis">Powered by real search + AI</div>
                 </div>
               </div>
 
-              <v-chip size="small" color="primary" variant="tonal">15 hrs</v-chip>
+              <v-chip size="small" color="primary" variant="tonal">
+                {{ previewLoading ? 'Loading...' : `${homepagePreview.estimatedHours} hrs` }}
+              </v-chip>
             </div>
 
-            <v-img
-              src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80"
-              height="240"
-              cover
-              class="rounded-xl mb-5"
+            <v-skeleton-loader
+              v-if="previewLoading"
+              type="image, article"
+              class="bg-transparent"
             />
 
-            <div class="text-h5 font-weight-bold mb-2">Spiritfarer</div>
+            <template v-else>
+              <v-img
+                :src="homepagePreview.imageUrl"
+                height="240"
+                cover
+                class="rounded-xl mb-5"
+              />
 
-            <div class="d-flex flex-wrap ga-2 mb-4">
-              <v-chip size="small" color="primary" variant="tonal">Cozy</v-chip>
-              <v-chip size="small" color="secondary" variant="tonal">Story Rich</v-chip>
-              <v-chip size="small" variant="outlined" class="chip-soft">Management</v-chip>
-            </div>
+              <div class="text-h5 font-weight-bold mb-2">{{ homepagePreview.title }}</div>
 
-            <p class="text-body-2 muted-copy mb-5">
-              A warm, emotional management adventure with gorgeous art, approachable systems, and a relaxed pace that makes it ideal for players wanting comfort plus heart.
-            </p>
-
-            <div class="preview-meta">
-              <div>
-                <div class="text-caption text-medium-emphasis">Why it works</div>
-                <div class="text-body-2">Calm pacing, heartfelt characters, and no punishing difficulty curve.</div>
+              <div class="d-flex flex-wrap ga-2 mb-4">
+                <v-chip
+                  v-for="tag in homepagePreview.tags?.slice(0, 3)"
+                  :key="tag"
+                  size="small"
+                  color="primary"
+                  variant="tonal"
+                >
+                  {{ tag }}
+                </v-chip>
               </div>
-              <v-btn
-                color="primary"
-                variant="flat"
-                @click="useExample('I want a cozy game with a great story under 20 hours')"
-              >
-                Preview results
-              </v-btn>
-            </div>
+
+              <p class="text-body-2 muted-copy mb-5">
+                {{ homepagePreview.description }}
+              </p>
+
+              <div class="preview-meta">
+                <div>
+                  <div class="text-caption text-medium-emphasis">Why it works</div>
+                  <div class="text-body-2">
+                    {{ homepagePreview.whyItMatches || 'A strong fit based on tone, pacing, and genre.' }}
+                  </div>
+                </div>
+                <v-btn
+                  color="primary"
+                  variant="flat"
+                  @click="useExample(previewPrompt)"
+                >
+                  Preview results
+                </v-btn>
+              </div>
+            </template>
           </v-card>
         </v-col>
       </v-row>
@@ -234,6 +308,11 @@ const clearFilters = () => {
 .preview-meta { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
 .hero-action { min-width: 180px; }
 .selected-tags { min-height: 48px; }
+
+.hero-preview :deep(.v-skeleton-loader__bone) {
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
 @media (max-width: 760px) {
   .hero-search-card, .hero-preview { padding: 18px; }
   .preview-meta { flex-direction: column; align-items: flex-start; }
