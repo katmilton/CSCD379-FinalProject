@@ -93,7 +93,7 @@ NextQuest is an AI-powered game discovery journal that helps players find their 
 
 ### Mobile Experience
 
-![Screenshot](images/mobile.png)
+<img src=images/mobile.png alt="Screenshot" width=50% height=auto>
 
 ## What I Learned
 
