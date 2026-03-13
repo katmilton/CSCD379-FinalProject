@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const prompt = ref('')
+const selectedMoods = ref<string[]>([])
 const loading = ref(false)
 const errorMessage = ref('')
 
@@ -15,8 +16,16 @@ const { getRecommendations } = useRecommendations()
 const recommendationPrompt = useState<string>('recommendationPrompt', () => '')
 const recommendationResults = useState<any[]>('recommendationResults', () => [])
 
+const buildPrompt = () => {
+  const parts: string[] = []
+  if (prompt.value.trim()) parts.push(prompt.value.trim())
+  if (selectedMoods.value.length) parts.push(`Focus on these vibes or tags: ${selectedMoods.value.join(', ')}.`)
+  return parts.join('\n')
+}
+
 const submitPrompt = async () => {
-  if (!prompt.value.trim()) return
+  const finalPrompt = buildPrompt()
+  if (!finalPrompt.trim()) return
 
   try {
     loading.value = true
@@ -26,14 +35,15 @@ const submitPrompt = async () => {
       await initProfile()
     }
 
-    const response = await getRecommendations(prompt.value)
+    const response = await getRecommendations(finalPrompt)
+
     recommendationPrompt.value = response.prompt
     recommendationResults.value = response.recommendations
 
-    await navigateTo(`/results?prompt=${encodeURIComponent(prompt.value)}`)
+    await navigateTo(`/results?prompt=${encodeURIComponent(response.prompt)}`)
   } catch (error) {
     console.error(error)
-    errorMessage.value = 'Something went wrong while generating recommendations.'
+    errorMessage.value = 'The recommendation service is temporarily unavailable. Please try again.'
   } finally {
     loading.value = false
   }
@@ -42,6 +52,10 @@ const submitPrompt = async () => {
 const useExample = async (value: string) => {
   prompt.value = value
   await submitPrompt()
+}
+
+const clearFilters = () => {
+  selectedMoods.value = []
 }
 </script>
 
@@ -72,7 +86,7 @@ const useExample = async (value: string) => {
               </div>
             </div>
 
-            <v-card class="glass-card hero-search-card fade-up-delay-2" rounded="2xl">
+            <v-card class="glass-card hero-search-card shimmer-border fade-up-delay-2" rounded="2xl">
               <form @submit.prevent="submitPrompt">
                 <v-textarea
                   v-model="prompt"
@@ -84,11 +98,24 @@ const useExample = async (value: string) => {
                 />
 
                 <div class="d-flex flex-column flex-sm-row ga-3 mt-5">
-                  <v-btn color="primary" size="large" prepend-icon="mdi-magnify" class="hero-action" :loading="loading" type="submit">
+                  <v-btn
+                    color="primary"
+                    size="large"
+                    prepend-icon="mdi-magnify"
+                    class="hero-action"
+                    :loading="loading"
+                    type="submit"
+                  >
                     Search games
                   </v-btn>
 
-                  <v-btn variant="tonal" size="large" prepend-icon="mdi-bookmark-outline" class="hero-action" to="/my-list">
+                  <v-btn
+                    variant="tonal"
+                    size="large"
+                    prepend-icon="mdi-bookmark-outline"
+                    class="hero-action"
+                    to="/my-list"
+                  >
                     Open my list
                   </v-btn>
                 </div>
@@ -102,10 +129,34 @@ const useExample = async (value: string) => {
                     :key="item"
                     size="small"
                     variant="outlined"
-                    class="interactive-lift"
+                    class="chip-soft interactive-lift"
                     @click="useExample(item)"
                   >
                     {{ item }}
+                  </v-chip>
+                </div>
+              </div>
+
+              <div class="d-flex align-center justify-space-between mt-6 mb-2 ga-3 flex-wrap">
+                <div class="text-caption text-medium-emphasis">Tap tags to add them to the search context</div>
+                <v-btn
+                  v-if="selectedMoods.length"
+                  variant="text"
+                  size="small"
+                  prepend-icon="mdi-close"
+                  @click="clearFilters"
+                >
+                  Clear tags
+                </v-btn>
+              </div>
+
+              <MoodChipRow v-model="selectedMoods" class="fade-up-delay-3" />
+
+              <div v-if="selectedMoods.length" class="selected-tags mt-4">
+                <div class="text-caption text-medium-emphasis mb-2">Search will include</div>
+                <div class="d-flex flex-wrap ga-2">
+                  <v-chip v-for="mood in selectedMoods" :key="mood" color="primary" variant="tonal" size="small">
+                    {{ mood }}
                   </v-chip>
                 </div>
               </div>
@@ -114,13 +165,11 @@ const useExample = async (value: string) => {
                 {{ errorMessage }}
               </div>
             </v-card>
-
-            <MoodChipRow class="fade-up-delay-3" />
           </div>
         </v-col>
 
         <v-col cols="12" lg="5">
-          <v-card class="glass-card card-hover hero-preview fade-up-delay-3" rounded="2xl">
+          <v-card class="glass-card card-hover hero-preview shimmer-border spotlight-card float-card fade-up-delay-3" rounded="2xl">
             <div class="d-flex align-center justify-space-between ga-3 mb-5">
               <div class="d-flex align-center ga-3">
                 <v-avatar color="secondary" size="46">
@@ -147,10 +196,10 @@ const useExample = async (value: string) => {
             <div class="d-flex flex-wrap ga-2 mb-4">
               <v-chip size="small" color="primary" variant="tonal">Cozy</v-chip>
               <v-chip size="small" color="secondary" variant="tonal">Story Rich</v-chip>
-              <v-chip size="small" variant="outlined">Management</v-chip>
+              <v-chip size="small" variant="outlined" class="chip-soft">Management</v-chip>
             </div>
 
-            <p class="text-body-2 mb-5" style="color: rgba(255,255,255,.7)">
+            <p class="text-body-2 muted-copy mb-5">
               A warm, emotional management adventure with gorgeous art, approachable systems, and a relaxed pace that makes it ideal for players wanting comfort plus heart.
             </p>
 
@@ -159,7 +208,13 @@ const useExample = async (value: string) => {
                 <div class="text-caption text-medium-emphasis">Why it works</div>
                 <div class="text-body-2">Calm pacing, heartfelt characters, and no punishing difficulty curve.</div>
               </div>
-              <v-btn color="primary" variant="flat" @click="useExample('I want a cozy game with a great story under 20 hours')">Preview results</v-btn>
+              <v-btn
+                color="primary"
+                variant="flat"
+                @click="useExample('I want a cozy game with a great story under 20 hours')"
+              >
+                Preview results
+              </v-btn>
             </div>
           </v-card>
         </v-col>
@@ -178,6 +233,7 @@ const useExample = async (value: string) => {
 .hero-preview { padding: 22px; }
 .preview-meta { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
 .hero-action { min-width: 180px; }
+.selected-tags { min-height: 48px; }
 @media (max-width: 760px) {
   .hero-search-card, .hero-preview { padding: 18px; }
   .preview-meta { flex-direction: column; align-items: flex-start; }
