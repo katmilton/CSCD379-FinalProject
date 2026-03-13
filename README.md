@@ -80,14 +80,20 @@ NextQuest is an AI-powered game discovery journal that helps players find their 
 
 ## Screenshots
 ### Home
+![Screenshot](images/home.png)
 
 ### AI Recommendations
+![Screenshot](images/results.png)
 
 ### My List (Game Journal)
+![Screenshot](images/list.png)
 
 ### Recommendation History
+![Screenshot](images/history.png)
 
 ### Mobile Experience
+
+![Screenshot](images/mobile.png)
 
 ## What I Learned
 
