@@ -1,8 +1,10 @@
+export type SavedStatus = 'Want to Play' | 'Playing' | 'Finished' | 'Dropped'
+
 export type SavedGameRecord = {
   id: number
   profileId: string
   gameId: number
-  status: 'Want to Play' | 'Playing' | 'Finished' | 'Dropped'
+  status: SavedStatus
   note?: string
   createdAt: string
   updatedAt: string
@@ -26,19 +28,63 @@ export const useSavedGames = () => {
   const config = useRuntimeConfig()
 
   const getSavedGames = async (): Promise<SavedGameRecord[]> => {
-    if (!profileId.value) throw new Error('Profile not initialized')
-    return await $fetch<SavedGameRecord[]>(`${config.public.apiBaseUrl}/saved-games`, {
-      params: { profileId: profileId.value }
-    })
+    if (!profileId.value) {
+      throw new Error('Profile not initialized')
+    }
+
+    return await $fetch<SavedGameRecord[]>(
+      `${config.public.apiBaseUrl}/saved-games`,
+      {
+        params: {
+          profileId: profileId.value
+        }
+      }
+    )
   }
 
-  const saveGame = async (gameId: number, status: 'Want to Play' | 'Playing' | 'Finished' | 'Dropped' = 'Want to Play', note = '') => {
-    if (!profileId.value) throw new Error('Profile not initialized')
+  const saveGame = async (
+    gameId: number,
+    status: SavedStatus = 'Want to Play',
+    note = ''
+  ) => {
+    if (!profileId.value) {
+      throw new Error('Profile not initialized')
+    }
+
     return await $fetch(`${config.public.apiBaseUrl}/saved-games`, {
       method: 'POST',
-      body: { profileId: profileId.value, gameId, status, note }
+      body: {
+        profileId: profileId.value,
+        gameId,
+        status,
+        note
+      }
     })
   }
 
-  return { getSavedGames, saveGame }
+  const updateSavedGame = async (
+    id: number,
+    updates: {
+      status?: SavedStatus
+      note?: string
+    }
+  ) => {
+    return await $fetch(`${config.public.apiBaseUrl}/saved-games/${id}`, {
+      method: 'PATCH',
+      body: updates
+    })
+  }
+
+  const deleteSavedGame = async (id: number) => {
+    return await $fetch(`${config.public.apiBaseUrl}/saved-games/${id}`, {
+      method: 'DELETE'
+    })
+  }
+
+  return {
+    getSavedGames,
+    saveGame,
+    updateSavedGame,
+    deleteSavedGame
+  }
 }
