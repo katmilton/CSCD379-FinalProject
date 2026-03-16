@@ -1,0 +1,3 @@
+<template>
+  <HomeHeroSearch />
+</template>

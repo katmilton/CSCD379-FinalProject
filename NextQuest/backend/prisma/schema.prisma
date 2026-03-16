@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model Profile {
+  id         String                  @id
+  createdAt  DateTime                @default(now())
+  savedGames SavedGame[]
+  history    RecommendationHistory[]
+}
+
+model Game {
+  id               Int                     @id @default(autoincrement())
+  title            String
+  description      String
+  genres           String
+  tags             String
+  platforms        String
+  estimatedHours   Int
+  releaseYear      Int
+  imageUrl         String
+  searchDocumentId String                  @unique
+  createdAt        DateTime                @default(now())
+  savedGames       SavedGame[]
+}
+
+model SavedGame {
+  id        Int      @id @default(autoincrement())
+  profileId String
+  gameId    Int
+  status    String
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile Profile @relation(fields: [profileId], references: [id])
+  game    Game    @relation(fields: [gameId], references: [id])
+
+  @@unique([profileId, gameId])
+}
+
+model RecommendationHistory {
+  id         Int      @id @default(autoincrement())
+  profileId  String
+  prompt     String
+  resultJson String @db.NVarChar(Max)
+  createdAt  DateTime @default(now())
+
+  profile Profile @relation(fields: [profileId], references: [id])
+}
